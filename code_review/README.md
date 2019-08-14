@@ -15,6 +15,7 @@
 - Avoid using `print` here is better to use a logger.
 - Error response does not have correct HTTP code or a useful message.
 - Use DRF's `status` to respond with correct HTTP status code.
+- Encapsulate response to allow for future addition of data.
 
 View fixed:
 
@@ -46,17 +47,33 @@ class UsersViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminUser]
 
     def create(self, request):
+        """Create handler.
+
+        Supports HTTP POST method. Creates a user if the request body is correct.
+        A user will be created using an `email`, `password` and `comment`.
+
+        :param request: Request object. Must have `email`, `password` and `comment`.
+        :return: 200 if successful or 400 if there's a validation error.
+        :rtype: :class:`Response`
+        """
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True):
         self.perform_create(serializer)
         return Response({
             'success': True,
-            'id': serializer.data.id,
-            },
-            status=status=HTTP_200_OK
-        )
+            'response': {
+                'id': serializer.data.id,
+            }
+        },
+        status=status=HTTP_200_OK)
 
     def perform_create(self, serializer):
+        """Perform actual object creation.
+
+        .. note:: Implement any extra logic for before/after creation here.
+
+        :param serializer: Serializer object to use.
+        """
         serializer.save(
             email=serializer.validated_data['email'],
             password=serializer.validated_data['password'],
