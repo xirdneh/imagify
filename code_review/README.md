@@ -15,7 +15,6 @@
 - Avoid using `print` here is better to use a logger.
 - Error response does not have correct HTTP code or a useful message.
 - Use DRF's `status` to respond with correct HTTP status code.
-- Log the error for reference.
 
 View fixed:
 
